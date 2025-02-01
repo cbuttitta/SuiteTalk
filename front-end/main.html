@@ -5,16 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <link rel="icon" type="image/x-icon" href="../resources/image.png">
+    <title>SuiteTalk</title>
 </head>
 
 <body>
-    <center>
-        <div id="root">
-            <input id="input" type="text" placeholder="information"></input>
-            <button id="button" onclick="getInput()">Send</button>
-        </div>
-    </center>
+    <div class="centered-content">
+        <h2 id="logo">SuiteTalk</h2>
+        <form autocomplete="off">
+            <div class="autocomplete">
+                <input id="apartment-input" type="text" placeholder="Apartment Name" oninput="checkInput()"></input>
+                <button id="submit-button" onclick="getInput()" disabled>Send</button>
+            </div>
+        </form>
+    </div>
 </body>
 <script src="script.js"></script>
 
