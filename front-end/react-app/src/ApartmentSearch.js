@@ -1,17 +1,8 @@
 import "./ApartmentSearch.css";
-import { useState } from "react";
-
-const apartments = [
-  "The Edge",
-  "University Walk",
-  "University Crossing",
-  "The Mill",
-  "University Village",
-];
+import { useState, useEffect } from "react";
 
 function App() {
   document.title = "SuiteTalk";
-
   return (
     <div>
       <ApartmentSearchForm />
@@ -24,6 +15,31 @@ function ApartmentSearchForm() {
   const [showElement, setShowElement] = useState(false);
   const [activeListing, setActiveListing] = useState(0);
   const [inList, setInList] = useState(true);
+  const [apartments, setApartments] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/?query=apartments")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setApartments(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!apartments) return <p>No data to display.</p>;
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -84,6 +100,7 @@ function ApartmentSearchForm() {
           {showElement && (
             <div>
               <ListOptions
+                apartments={apartments}
                 inputValue={inputValue}
                 activeListing={activeListing}
                 setInputValue={setInputValue}
@@ -105,7 +122,13 @@ function ApartmentSearchForm() {
   );
 }
 
-function ListOptions({ inputValue, activeListing, setInputValue, setShowElement }) {
+function ListOptions({
+  apartments,
+  inputValue,
+  activeListing,
+  setInputValue,
+  setShowElement,
+}) {
   const filteredApartments = apartments.filter((apartment) =>
     apartment.toLowerCase().startsWith(inputValue.toLowerCase())
   );
@@ -118,7 +141,9 @@ function ListOptions({ inputValue, activeListing, setInputValue, setShowElement 
   const listItems = filteredApartments.map((apartment, index) => (
     <div
       key={apartment}
-      className={`apartment-list-item ${index === activeListing ? "active" : ""}`}
+      className={`apartment-list-item ${
+        index === activeListing ? "active" : ""
+      }`}
       onClick={() => handleSelect(apartment)}
       style={{ cursor: "pointer" }}
     >
