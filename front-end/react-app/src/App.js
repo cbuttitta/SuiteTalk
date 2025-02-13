@@ -4,17 +4,17 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ApartmentSearch from "./ApartmentSearch";
 import NotFound from "./NotFound";
 import Signup from "./Signup";
-
+import Login from "./Login";
+import jwtDecode from "jwt-decode";
 
 
 function App() {
   document.title = "SuiteTalk";
-
   return (
     <Router>
 
       <Routes>
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/" element={<CheckUserLoggedIn />} />
         <Route path="/ApartmentSearch" element={<ApartmentSearch />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/Signup" element={<Signup />} />
@@ -23,53 +23,36 @@ function App() {
   );
 }
 
-function LoginForm() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-  
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      console.log("Login attempt:", { email, password });
-      console.log(typeof(email));
-    };
-  
-    return (
-      
-      <div className="centered-content">
-        <h2 id="logo">SuiteTalk</h2>
-        <p id="slogan">Connect with your community!</p>
-  
-        <form onSubmit={handleSubmit} autoComplete="off">
-          <div>
-            <input
-              id="email-input"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <input
-              id="password-input"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button id="submit-button" disabled={email.length < 5 || password.length < 5}>
-            Login
-          </button>
-          <p id="login-option">
-            Don't have an account? <Link to="/Signup">Sign up</Link>
-          </p>
-        </form>
-      </div>
-    );
-  
-}
+function CheckUserLoggedIn() {
+  const [user, setUser] = useState(null);
+  const [showSignup, setShowSignup] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedUser = jwtDecode(token);
+        setUser(decodedUser);
+      } catch (error) {
+        console.error("Invalid token");
+      }
+    }
+  }, []);
+
+  return (
+    <div>
+      {user ? (
+        <Profile />
+      ) : showSignup ? (
+        <Signup setUser={setUser} />
+      ) : (
+        <Login setUser={setUser} />
+      )}
+      <button onClick={() => setShowSignup(!showSignup)}>
+        {showSignup ? "Switch to Login" : "Switch to Signup"}
+      </button>
+    </div>
+  );
+};
 
 export default App;

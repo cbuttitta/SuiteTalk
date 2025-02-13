@@ -2,15 +2,28 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Login.css";
 import Signup from "./Signup";
+import axios from "axios";
 
-function Login() {
+
+function Login({setUser}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     console.log("Login attempt:", { email, password });
     // Add authentication logic here
+    try {
+      const res = await axios.post("http://localhost:5000/login", { email, password });
+
+      // Store token in local storage
+      localStorage.setItem("token", res.data.token);
+
+      // Set user state
+      setUser(res.data.user);
+    } catch (err) {
+      setError("Invalid email or password");
+    }
   };
 
   return (
