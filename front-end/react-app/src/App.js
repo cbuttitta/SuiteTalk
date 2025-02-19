@@ -1,11 +1,12 @@
 import "./App.css";
-import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ApartmentSearch from "./ApartmentSearch";
 import NotFound from "./NotFound";
 import Signup from "./Signup";
 import Login from "./Login";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+
 
 
 function App() {
@@ -42,15 +43,12 @@ function CheckUserLoggedIn() {
   return (
     <div>
       {user ? (
-        <Profile />
+        <ApartmentSearch />
       ) : showSignup ? (
         <Signup setUser={setUser} />
       ) : (
         <Login setUser={setUser} />
       )}
-      <button onClick={() => setShowSignup(!showSignup)}>
-        {showSignup ? "Switch to Login" : "Switch to Signup"}
-      </button>
     </div>
   );
 };

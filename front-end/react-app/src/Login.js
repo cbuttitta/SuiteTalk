@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Login.css";
-import Signup from "./Signup";
+import "./App.css";
 import axios from "axios";
+  
+
 
 
 function Login({setUser}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -35,7 +37,7 @@ function Login({setUser}) {
       <form onSubmit={handleSubmit} autoComplete="off">
         <div>
           <input
-            id="email-input"
+            id="value-input"
             type="email"
             placeholder="Email"
             value={email}
@@ -46,7 +48,7 @@ function Login({setUser}) {
 
         <div>
           <input
-            id="password-input"
+            id="value-input"
             type="password"
             placeholder="Password"
             value={password}
@@ -54,14 +56,14 @@ function Login({setUser}) {
             required
           />
         </div>
-
+        {error && <span style={{ color: "red" }}>{error}</span>}
         <button id="submit-button" disabled={email.length < 5 || password.length < 5}>
           Login
         </button>
 
-        <span id="login-option">
+        <p id="login-option">
           Don't have an account? <Link to="/Signup">Sign up</Link>
-        </span>
+        </p>
       </form>
     </div>
   );

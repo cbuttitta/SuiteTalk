@@ -1,5 +1,8 @@
 import { useState } from "react";
 import "./App.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 function Signup({setUser}) {
   const [email, setEmail] = useState("");
@@ -7,9 +10,9 @@ function Signup({setUser}) {
   const [acceptableEmail, setAcceptableEmail] = useState(true);
   const [acceptablePassword, setAcceptablePassword] = useState(true);
   const [username, setUsername] = useState("");
-  const [acceptableUsername, setAcceptableUsername] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,6 +22,9 @@ function Signup({setUser}) {
       //regex for email validation
       setAcceptableEmail(false);
     }
+    else{
+      setAcceptableEmail(true);
+    }
     if (
       password.length < 10 ||
       !/[A-Z]/.test(password) ||
@@ -27,6 +33,8 @@ function Signup({setUser}) {
       //checks for valid length > 10, uppercase character, and special character
       setAcceptablePassword(false);
     }
+    else{
+      setAcceptablePassword(true);}
     /*
       if(username is unique){setAcceptableUsername(true);} //check database for unique username
       */
@@ -43,6 +51,7 @@ function Signup({setUser}) {
       // Set user state
       setUser(res.data.user);
       setSuccess("Signup successful! Redirecting...");
+      navigate("/Login"); //redirect to login page
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
     }
@@ -56,7 +65,7 @@ function Signup({setUser}) {
       <form onSubmit={handleSubmit} autoComplete="off">
         <div>
           <input
-            id="email-input"
+            id="value-input"
             type="email"
             placeholder="Your Email"
             value={email}
@@ -71,7 +80,7 @@ function Signup({setUser}) {
         )}
         <div>
           <input
-            id="username-input"
+            id="value-input"
             type="text"
             placeholder="Create Username"
             value={username}
@@ -79,14 +88,9 @@ function Signup({setUser}) {
             required
           />
         </div>
-        {!acceptableUsername && (
-          <div>
-            <span style={{ color: "red" }}>Username in use</span>
-          </div>
-        )}
         <div>
           <input
-            id="password-input"
+            id="value-input"
             type="password"
             placeholder="Create a Password"
             value={password}
@@ -99,7 +103,12 @@ function Signup({setUser}) {
             <span style={{ color: "red" }}>Password format not accepted</span>
           </div>
         )}
-        {!error && (
+        {error && (
+          <div>
+            <span style={{ color: "red" }}>{error} </span>
+          </div>
+        )}
+        {success && (
           <div>
             <span style={{ color: "red" }}>{error} </span>
           </div>
