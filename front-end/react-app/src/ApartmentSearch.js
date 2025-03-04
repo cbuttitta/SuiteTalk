@@ -1,54 +1,25 @@
-import "./ApartmentSearch.css";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
-function App() {
-  document.title = "SuiteTalk";
-  return (
-    <div>
-      <ApartmentSearchForm />
-    </div>
-  );
-}
-
-function ApartmentSearchForm() {
+function ApartmentSearchForm({setApartmentName}) {
   const [inputValue, setInputValue] = useState("");
   const [showElement, setShowElement] = useState(false);
   const [activeListing, setActiveListing] = useState(0);
   const [inList, setInList] = useState(true);
   const [apartments, setApartments] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/?query=apartments")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setApartments(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error);
-        setLoading(false);
-      });
+    axios
+      .get("http://localhost:5000/apartments")
+      .then((response) => setApartments(response.data))
+      .catch((error) => setError(error));
   }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  if (!apartments) return <p>No data to display.</p>;
+  if (!apartments) return <p>Error getting data: {error}</p>;
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
     setShowElement(event.target.value !== "");
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Form submitted:", inputValue);
   };
 
   const changeActive = (event) => {
@@ -76,6 +47,7 @@ function ApartmentSearchForm() {
       if (filteredApartments.length > 0) {
         const selectedApartment = filteredApartments[activeListing];
         setInputValue(selectedApartment);
+        setApartmentName(selectedApartment);
         setShowElement(false);
       } else {
         setInList(false);
@@ -84,13 +56,9 @@ function ApartmentSearchForm() {
   };
 
   return (
-    <div className="centered-content">
-      <h2 id="logo">SuiteTalk</h2>
-      <p id="slogan">Find your Community!</p>
-      <form onSubmit={handleSubmit} autoComplete="off">
         <div>
           <input
-            id="apartment-input"
+            className="value-input"
             type="text"
             placeholder="Apartment Name"
             value={inputValue}
@@ -105,6 +73,7 @@ function ApartmentSearchForm() {
                 activeListing={activeListing}
                 setInputValue={setInputValue}
                 setShowElement={setShowElement}
+                setApartmentName={setApartmentName}
               />
             </div>
           )}
@@ -113,21 +82,16 @@ function ApartmentSearchForm() {
               <span style={{ color: "red" }}>Apartment not found</span>
             </div>
           )}
-          <button id="submit-button" disabled={inputValue.length <= 5}>
-            Send
-          </button>
-        </div>
-      </form>
-    </div>
+          </div>
   );
 }
-
 function ListOptions({
   apartments,
   inputValue,
   activeListing,
   setInputValue,
   setShowElement,
+  setApartmentName
 }) {
   const filteredApartments = apartments.filter((apartment) =>
     apartment.toLowerCase().startsWith(inputValue.toLowerCase())
@@ -135,6 +99,7 @@ function ListOptions({
 
   const handleSelect = (apartment) => {
     setInputValue(apartment);
+    setApartmentName(apartment);
     setShowElement(false);
   };
 
@@ -166,4 +131,4 @@ function BoldText({ text, highlightLength }) {
   );
 }
 
-export default App;
+export default ApartmentSearchForm;

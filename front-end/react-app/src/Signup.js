@@ -2,27 +2,26 @@ import { useState } from "react";
 import "./App.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import ApartmentSearch from "./ApartmentSearch";
 
-
-function Signup({setUser}) {
+function Signup({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [acceptableEmail, setAcceptableEmail] = useState(true);
   const [acceptablePassword, setAcceptablePassword] = useState(true);
   const [username, setUsername] = useState("");
+  const [apartment, setApartmentName] = useState("");
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Login attempt:", { email, password });
-    console.log(typeof email);
+    console.log("Signup attempt:", { email, username, password, apartment });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       //regex for email validation
       setAcceptableEmail(false);
-    }
-    else{
+    } else {
       setAcceptableEmail(true);
     }
     if (
@@ -32,28 +31,28 @@ function Signup({setUser}) {
     ) {
       //checks for valid length > 10, uppercase character, and special character
       setAcceptablePassword(false);
+    } else {
+      setAcceptablePassword(true);
     }
-    else{
-      setAcceptablePassword(true);}
-    /*
-      if(username is unique){setAcceptableUsername(true);} //check database for unique username
-      */
-    try {
-      const res = await axios.post("http://localhost:5000/signup", {
-        username,
-        email,
-        password,
-      });
+    if (acceptableEmail && acceptablePassword) {
+      try {
+        const res = await axios.post("http://localhost:5000/signup", {
+          username,
+          email,
+          password,
+          apartment,
+        });
 
-      // Store JWT token
-      localStorage.setItem("token", res.data.token);
+        // Store JWT token
+        localStorage.setItem("token", res.data.token);
 
-      // Set user state
-      setUser(res.data.user);
-      setSuccess("Signup successful! Redirecting...");
-      navigate("/Login"); //redirect to login page
-    } catch (err) {
-      setError(err.response?.data?.error || "Signup failed");
+        // Set user state
+        setUser(res.data.user);
+        setSuccess("Signup successful! Redirecting...");
+        navigate("/"); //redirect to app page
+      } catch (err) {
+        setError(err.response?.data?.error || "Signup failed");
+      }
     }
   };
 
@@ -65,7 +64,7 @@ function Signup({setUser}) {
       <form onSubmit={handleSubmit} autoComplete="off">
         <div>
           <input
-            id="value-input"
+            className="value-input"
             type="email"
             placeholder="Your Email"
             value={email}
@@ -80,7 +79,7 @@ function Signup({setUser}) {
         )}
         <div>
           <input
-            id="value-input"
+            className="value-input"
             type="text"
             placeholder="Create Username"
             value={username}
@@ -90,13 +89,16 @@ function Signup({setUser}) {
         </div>
         <div>
           <input
-            id="value-input"
+            className="value-input"
             type="password"
             placeholder="Create a Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+        </div>
+        <div>
+          <ApartmentSearch setApartmentName={setApartmentName} />
         </div>
         {!acceptablePassword && (
           <div>
@@ -110,12 +112,12 @@ function Signup({setUser}) {
         )}
         {success && (
           <div>
-            <span style={{ color: "red" }}>{error} </span>
+            <span style={{ color: "green" }}>{success} </span>
           </div>
         )}
         <button
           id="submit-button"
-          disabled={email.length < 5 || password.length < 5}
+          disabled={!acceptableEmail || !acceptablePassword || apartment === ""}
         >
           Sign Up
         </button>

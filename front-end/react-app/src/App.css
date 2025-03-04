@@ -39,7 +39,7 @@ body {
   margin-top: 0;  
 }
 
-#value-input,
+.value-input,
 #submit-button {
   border-radius: 4px;
   width: 100%;
@@ -78,4 +78,18 @@ body {
 
 #login-option{
   margin-top: 10px;
+}
+
+.apartment-list-item {
+  margin: 5px 0;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apartment-list-item.active {
+  background-color: #e2e2e2;
 }

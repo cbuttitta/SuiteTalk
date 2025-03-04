@@ -1,32 +1,35 @@
 import "./App.css";
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ApartmentSearch from "./ApartmentSearch";
+import Post from "./Post";
 import NotFound from "./NotFound";
 import Signup from "./Signup";
 import Login from "./Login";
 import { jwtDecode } from "jwt-decode";
-
-
+import ProtectedRoute from "./ProtectedRoute";
+import { AuthProvider } from "./AuthContext";
 
 function App() {
   document.title = "SuiteTalk";
   return (
+    <AuthProvider>
     <Router>
-
       <Routes>
+        {/* Public Routes*/}     
         <Route path="/" element={<CheckUserLoggedIn />} />
-        <Route path="/ApartmentSearch" element={<ApartmentSearch />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/Signup" element={<Signup />} />
+        <Route path="/Login" element={<Login />} />
+        {/* Private Routes*/} 
+        <Route path="/Post" element={<ProtectedRoute><Post /></ProtectedRoute>} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 
 function CheckUserLoggedIn() {
   const [user, setUser] = useState(null);
-  const [showSignup, setShowSignup] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -40,17 +43,7 @@ function CheckUserLoggedIn() {
     }
   }, []);
 
-  return (
-    <div>
-      {user ? (
-        <ApartmentSearch />
-      ) : showSignup ? (
-        <Signup setUser={setUser} />
-      ) : (
-        <Login setUser={setUser} />
-      )}
-    </div>
-  );
-};
+  return <div>{user ? <Post /> : <Login setUser={setUser} />}</div>;
+}
 
 export default App;
